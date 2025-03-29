@@ -9,13 +9,6 @@ import (
 	"net/url"
 )
 
-// TODO: Refactor this to use a proper HTTP client with error handling and retries
-// TODO: Add caching for API responses to reduce load on Modrinth API
-// TODO: Refactor the code to use a proper logging library (e.g. "github.com/charmbracelet/log") instead of fmt.Println
-// TODO: Refactor the code to use a proper configuration library (e.g. "github.com/spf13/viper") instead of hardcoding values
-// TODO: Redo data model types (fix errors in models, fix incorrect types, etc.)
-// TODO: Implement requests to the Modrinth API
-
 // Modrinth API base URL
 const baseURL = "https://api.modrinth.com/v2"
 
