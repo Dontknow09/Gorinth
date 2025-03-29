@@ -3,11 +3,17 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"net/url"
 )
 
 const baseURL = "https://api.modrinth.com/v2"
+
+type User struct {
+	ID       string `json:"id"`
+	Username string `json:"username"`
+}
 
 // Project represents the structure of a Modrinth project
 type Project struct {
@@ -23,6 +29,13 @@ type Version struct {
 	Version string `json:"version"`
 }
 
+func SearchProjects() {
+	searchURL := fmt.Sprintf("%s/search", baseURL)
+	query := url.Values{}
+	query.Set("q", "fabric")
+	query.Set("limit", "5")
+}
+
 // FetchProject fetches the project details from Modrinth API
 func FetchProject(projectID string) (*Project, error) {
 	url := fmt.Sprintf("%s/project/%s", baseURL, projectID)
@@ -36,7 +49,7 @@ func FetchProject(projectID string) (*Project, error) {
 		return nil, fmt.Errorf("failed to fetch project: %s", resp.Status)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +76,7 @@ func FetchProjectsByAuthor(authorID string) ([]Project, error) {
 		return nil, fmt.Errorf("failed to fetch projects: %s", resp.Status)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +103,7 @@ func FetchProjectVersions(projectID string) ([]Version, error) {
 		return nil, fmt.Errorf("failed to fetch project versions: %s", resp.Status)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +130,7 @@ func FetchProjectDependencies(projectID string) ([]Project, error) {
 		return nil, fmt.Errorf("failed to fetch project dependencies: %s", resp.Status)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
