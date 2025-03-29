@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Gorinth/models"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,26 +9,15 @@ import (
 	"net/url"
 )
 
+// TODO: Refactor this to use a proper HTTP client with error handling and retries
+// TODO: Add caching for API responses to reduce load on Modrinth API
+// TODO: Refactor the code to use a proper logging library (e.g. "github.com/charmbracelet/log") instead of fmt.Println
+// TODO: Refactor the code to use a proper configuration library (e.g. "github.com/spf13/viper") instead of hardcoding values
+// TODO: Redo data model types (fix errors in models, fix incorrect types, etc.)
+// TODO: Implement requests to the Modrinth API
+
+// Modrinth API base URL
 const baseURL = "https://api.modrinth.com/v2"
-
-type User struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
-}
-
-// Project represents the structure of a Modrinth project
-type Project struct {
-	ID          string `json:"id"`
-	Slug        string `json:"slug"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-}
-
-// Version represents the structure of a Modrinth project version
-type Version struct {
-	ID      string `json:"id"`
-	Version string `json:"version"`
-}
 
 func SearchProjects() {
 	searchURL := fmt.Sprintf("%s/search", baseURL)
@@ -37,7 +27,7 @@ func SearchProjects() {
 }
 
 // FetchProject fetches the project details from Modrinth API
-func FetchProject(projectID string) (*Project, error) {
+func FetchProject(projectID string) (*models.Project, error) {
 	url := fmt.Sprintf("%s/project/%s", baseURL, projectID)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -54,7 +44,7 @@ func FetchProject(projectID string) (*Project, error) {
 		return nil, err
 	}
 
-	var project Project
+	var project models.Project
 	err = json.Unmarshal(body, &project)
 	if err != nil {
 		return nil, err
@@ -64,7 +54,7 @@ func FetchProject(projectID string) (*Project, error) {
 }
 
 // FetchProjectsByAuthor fetches all projects by a specific author
-func FetchProjectsByAuthor(authorID string) ([]Project, error) {
+func FetchProjectsByAuthor(authorID string) ([]models.Project, error) {
 	url := fmt.Sprintf("%s/user/%s/projects", baseURL, authorID)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -81,7 +71,7 @@ func FetchProjectsByAuthor(authorID string) ([]Project, error) {
 		return nil, err
 	}
 
-	var projects []Project
+	var projects []models.Project
 	err = json.Unmarshal(body, &projects)
 	if err != nil {
 		return nil, err
@@ -91,7 +81,7 @@ func FetchProjectsByAuthor(authorID string) ([]Project, error) {
 }
 
 // FetchProjectVersions fetches all versions of a specific project
-func FetchProjectVersions(projectID string) ([]Version, error) {
+func FetchProjectVersions(projectID string) ([]models.Version, error) {
 	url := fmt.Sprintf("%s/project/%s/version", baseURL, projectID)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -108,7 +98,7 @@ func FetchProjectVersions(projectID string) ([]Version, error) {
 		return nil, err
 	}
 
-	var versions []Version
+	var versions []models.Version
 	err = json.Unmarshal(body, &versions)
 	if err != nil {
 		return nil, err
@@ -118,7 +108,7 @@ func FetchProjectVersions(projectID string) ([]Version, error) {
 }
 
 // FetchProjectDependencies fetches all dependencies of a specific project
-func FetchProjectDependencies(projectID string) ([]Project, error) {
+func FetchProjectDependencies(projectID string) ([]models.Project, error) {
 	url := fmt.Sprintf("%s/project/%s/dependencies", baseURL, projectID)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -135,7 +125,7 @@ func FetchProjectDependencies(projectID string) ([]Project, error) {
 		return nil, err
 	}
 
-	var dependencies []Project
+	var dependencies []models.Project
 	err = json.Unmarshal(body, &dependencies)
 	if err != nil {
 		return nil, err
@@ -179,7 +169,7 @@ func main() {
 
 	fmt.Printf("Versions of Project %s:\n", projectID)
 	for _, v := range versions {
-		fmt.Printf("- %s: %s\n", v.ID, v.Version)
+		fmt.Printf("- %s: %s\n", v.ID, v.Name)
 	}
 
 	// Example usage of FetchProjectDependencies
